@@ -1,10 +1,9 @@
 package com.josecambronero;
 
-import edu.gmu.swe.phosphor.runtime.MultiTainter;
-import edu.gmu.swe.phosphor.runtime.Taint;
+import edu.columbia.cs.psl.phosphor.runtime.MultiTainter;
+import edu.columbia.cs.psl.phosphor.runtime.Taint;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 
 public class ImplicitFlowsExamples {
 
@@ -16,7 +15,7 @@ public class ImplicitFlowsExamples {
         y = !x;
         Taint t = MultiTainter.getTaint(y);
         // we can now track unary negation, by using control flow tracking
-        assert(t != null);
+        assert (t != null);
     }
 
     public static void testExample2() {
@@ -32,7 +31,7 @@ public class ImplicitFlowsExamples {
         }
 
         Taint t = MultiTainter.getTaint(y);
-        assert(t != null);
+        assert (t != null);
     }
 
     public static void testExample3() {
@@ -40,7 +39,7 @@ public class ImplicitFlowsExamples {
         boolean x = MultiTainter.taintedBoolean(true, "x");
         // sink
         double y = (x) ? 1.0 : 2.0;
-        Taint t  = MultiTainter.getTaint(y);
+        Taint t = MultiTainter.getTaint(y);
         assert (t != null);
     }
 
@@ -50,7 +49,7 @@ public class ImplicitFlowsExamples {
         int y = 0;
 
         // loop termination condition allows information to flow
-        for(int i = 0; i < x; i++) {
+        for (int i = 0; i < x; i++) {
             y += i;
         }
 
@@ -80,4 +79,3 @@ public class ImplicitFlowsExamples {
     }
 
 }
-

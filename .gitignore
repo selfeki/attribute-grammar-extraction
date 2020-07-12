@@ -1,5 +1,6 @@
 /bin
 /target
+/temp
 .project
 .classpath
 .settings

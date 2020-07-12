@@ -3,10 +3,10 @@ package com.josecambronero;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import edu.gmu.swe.phosphor.runtime.MultiTainter;
-import edu.gmu.swe.phosphor.runtime.Taint;
-import edu.gmu.swe.phosphor.runtime.LinkedList;
-import edu.gmu.swe.phosphor.runtime.LinkedList.Node;
+import edu.columbia.cs.psl.phosphor.runtime.MultiTainter;
+import edu.columbia.cs.psl.phosphor.runtime.Taint;
+import edu.columbia.cs.psl.phosphor.struct.LinkedList;
+import edu.columbia.cs.psl.phosphor.struct.LinkedList.Node;
 
 
 public class ObjectTagExamples {
@@ -22,7 +22,7 @@ public class ObjectTagExamples {
         x = MultiTainter.taintedInt(100, "source 1");
         // Source
         int y;
-        y = MultiTainter.taintedInt(100, new Taint("source 2"));
+        y = MultiTainter.taintedInt(100, "source 2");
         // Sink
         int z = x + y;
         Taint tz = MultiTainter.getTaint(z);
@@ -30,16 +30,16 @@ public class ObjectTagExamples {
         System.out.println(tz.toString());
     }
 
-    public static void testExample2() {
-        // Create object tags for objects
-        Object s = "My string";
-        MultiTainter.taintedObject(s, new Taint("source x"));
-        Object s2 = identity(s);
-        Taint tag = MultiTainter.getTaint(s2);
-        assert (tag != null);
-        System.out.println((String) tag.getLabel());
-        System.out.println(tag.toString());
-    }
+    // public static void testExample2() {
+    //     // Create object tags for objects
+    //     Object s = "My string";
+    //     MultiTainter.taintedObject(s, new Taint("source x"));
+    //     Object s2 = identity(s);
+    //     Taint tag = MultiTainter.getTaint(s2);
+    //     assert (tag != null);
+    //     System.out.println((String) tag.getLabel());
+    //     System.out.println(tag.toString());
+    // }
 
     public static void testExample3() {
         // Creating more than 32 distinct tags (the advantage of object tags)
@@ -58,28 +58,28 @@ public class ObjectTagExamples {
         System.out.println(tag.toString());
     }
 
-    public static void testExample4() {
-        // Iterating over dependencies in an object taint tag
-        int x = MultiTainter.taintedInt(100, "x");
-        int y = MultiTainter.taintedInt(100, "y");
-        int z = x + y;
-        double w = MultiTainter.taintedDouble(100.0, "w");
-        int n = 0;
+    // public static void testExample4() {
+    //     // Iterating over dependencies in an object taint tag
+    //     int x = MultiTainter.taintedInt(100, "x");
+    //     int y = MultiTainter.taintedInt(100, "y");
+    //     int z = x + y;
+    //     double w = MultiTainter.taintedDouble(100.0, "w");
+    //     int n = 0;
 
-        int result = z + (int) w + n;
-        Taint tag = MultiTainter.getTaint(result);
-        assert (tag != null);
-        LinkedList<Object> dependencies = tag.getDependencies();
-        System.out.println(dependencies.toString());
+    //     int result = z + (int) w + n;
+    //     Taint tag = MultiTainter.getTaint(result);
+    //     assert (tag != null);
+    //     LinkedList<Object> dependencies = tag.getDependencies();
+    //     System.out.println(dependencies.toString());
 
-        // iterate over the linked list
-        Node currNode = (Node) dependencies.getFirst();
-        while (currNode != null) {
-            String currDepName = (String) currNode.entry;
-            System.out.println(currDepName);
-            currNode = currNode.next;
-        }
-    }
+    //     // iterate over the linked list
+    //     Node currNode = (Node) dependencies.getFirst();
+    //     while (currNode != null) {
+    //         String currDepName = (String) currNode.entry;
+    //         System.out.println(currDepName);
+    //         currNode = currNode.next;
+    //     }
+    // }
 
     public static void testExample5() {
         // Creating object tags for primitives
@@ -88,7 +88,7 @@ public class ObjectTagExamples {
         x = MultiTainter.taintedInt(100, "source 1");
         // Source
         int y;
-        y = MultiTainter.taintedInt(100, new Taint("source 2"));
+        y = MultiTainter.taintedInt(100, "source 2");
         // Sink
         int z = x + y;
         // cast int to string

@@ -1,6 +1,7 @@
 package com.josecambronero;
 
-import edu.gmu.swe.phosphor.runtime.Tainter;
+import edu.columbia.cs.psl.phosphor.runtime.MultiTainter;
+import edu.columbia.cs.psl.phosphor.runtime.Taint;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,16 +25,18 @@ public class IntegerTagExamples
         return 0;
     }
 
-    public static List<Integer> getTaintSources(int tag) {
-        char[] binaryRep = Integer.toBinaryString(tag).toCharArray();
-        List<Integer> sources = new ArrayList<Integer>();
-        for (int i = 0; i < binaryRep.length; i++) {
-            if (binaryRep[i] == '1') {
-                sources.add((int) Math.pow(2, 1 + i));
-            }
-        }
-        return sources;
-    }
+    // public static List<Integer> getTaintSources(Taint taint) {
+    //     // char[] binaryRep = Integer.toBinaryString(tag).toCharArray();
+    //     List<Integer> sources = new ArrayList<Integer>();
+    //     for (int i = 0; i < binaryRep.length; i++) {
+    //         int j = MultiTainter.taintedInt(0, "foo");
+    //         Taint t = MultiTainter.getTaint(i);
+    //         if (binaryRep[i] == j) {
+    //             sources.add((int) Math.pow(2, 1 + i));
+    //         }
+    //     }
+    //     return sources;
+    // }
 
     public static <E> void printList(List<E> l) {
         for (E elem : l) {
@@ -48,10 +51,12 @@ public class IntegerTagExamples
         // sink
         int y = 0;
         // primitive and taint tag
-        x = Tainter.taintedInt(x, 1);
+        x = MultiTainter.taintedInt(x, 1);
         y = x * 3;
         // check sink for taint
-        assert (Tainter.getTaint(y) != 0);
+        int i = MultiTainter.taintedInt(0, "foo");
+        Taint t = MultiTainter.getTaint(i);
+        assert (MultiTainter.getTaint(y) != t);
     }
 
     public static void testExample2() {
@@ -60,64 +65,73 @@ public class IntegerTagExamples
         int x = 0;
         // sink
         int y = 0;
-        x = Tainter.taintedInt(x, 1);
+        int i = MultiTainter.taintedInt(0, "foo");
+        Taint t = MultiTainter.getTaint(i);
+        x = MultiTainter.taintedInt(x, 1);
         // tainted
         y = x * 3;
-        assert (Tainter.getTaint(y) != 0);
+        assert (MultiTainter.getTaint(y) != t);
         // not tainted, as zero returns constant (not function of x)
         y = zero(x);
-        assert (Tainter.getTaint(y) == 0);
+        assert (MultiTainter.getTaint(y) == t);
     }
 
     public static void testExample3() {
         // Taint and arithmetic identities
         // source
         int x = 1;
-        x = Tainter.taintedInt(x, 1);
+        x = MultiTainter.taintedInt(x, 1);
         // sink
         int y = 0;
         y = 2 * x - (x + x);
-        assert (Tainter.getTaint(y) != 0);
+        int i = MultiTainter.taintedInt(0, "foo");
+        Taint t = MultiTainter.getTaint(i);
+        assert (MultiTainter.getTaint(y) != t);
     }
 
-    public static void testExample4() {
-        // Tracking sources of taint
-        // sources
-        int x = 0, w = 0, r = 0;
-        x = Tainter.taintedInt(x, 2);
-        w = Tainter.taintedInt(x, 16);
-        r = Tainter.taintedInt(x, 4);
-        // sinks
-        int y = 0, z = 0;
-        y = x * 3;
-        z = x + w;
+    // public static void testExample4() {
+    //     // Tracking sources of taint
+    //     // sources
+    //     int x = 0, w = 0, r = 0;
+    //     x = MultiTainter.taintedInt(x, 2);
+    //     w = MultiTainter.taintedInt(x, 16);
+    //     r = MultiTainter.taintedInt(x, 4);
+    //     // sinks
+    //     int y = 0, z = 0;
+    //     y = x * 3;
+    //     z = x + w;
+    //     int i = MultiTainter.taintedInt(0, "foo");
+    //     Taint t = MultiTainter.getTaint(i);
 
-        assert (Tainter.getTaint(y) == 2);
-        // get list of sources (recall taint tags are OR'ed)
-        List<Integer> zSources = getTaintSources(Tainter.getTaint(z));
-        assert (zSources.contains(Tainter.getTaint(x)));
-        assert (zSources.contains(Tainter.getTaint(w)));
-        assert (!zSources.contains(Tainter.getTaint(r)));
+    //     assert (MultiTainter.getTaint(y) == t);
+    //     // get list of sources (recall taint tags are OR'ed)
+    //     List<Integer> zSources = getTaintSources(MultiTainter.getTaint(z));
+        
+    //     assert (zSources.contains(MultiTainter.getTaint(x)));
+    //     assert (zSources.contains(MultiTainter.getTaint(w)));
+    //     assert (!zSources.contains(MultiTainter.getTaint(r)));
 
-    }
+    // }
 
     public static void testExample5() {
         // Element-level taint tags in array
         // source
         int x = 0;
-        x = Tainter.taintedInt(x, 1);
+        x = MultiTainter.taintedInt(x, 1);
         // (potential) sinks
         int[] y = new int[4];
         y[0] = x * 2;
-        assert (Tainter.getTaint(y[0]) != 0);
-        assert (Tainter.getTaint(y[1]) == 0);
+        int i = MultiTainter.taintedInt(0, "foo");
+        Taint t = MultiTainter.getTaint(i);
+        assert (MultiTainter.getTaint(y[0]) != t);
+        assert (MultiTainter.getTaint(y[1]) == t);
     }
 
     public static void testExample6() {
         // Boolean types
         // source
         boolean x;
-        x = Tainter.taintedBoolean(false, 2);
+        x = MultiTainter.taintedBoolean(false, 2);
         boolean y;
         y = x & false;
         //System.out.println(Tainter.getTaint(y));
@@ -136,14 +150,16 @@ public class IntegerTagExamples
         int x = 0;
         // sink
         int y = 0;
+        int i = MultiTainter.taintedInt(0, "foo");
+        Taint t = MultiTainter.getTaint(i);
         // primitive and taint tag
-        x = Tainter.taintedInt(x, 1);
+        x = MultiTainter.taintedInt(x, 1);
         y = x * 3;
         String ys = Integer.toString(y);
         // check sink for taint
-        assert (Tainter.getTaint(y) != 0);
+        assert (MultiTainter.getTaint(y) != t);
         // this fails for some reason
-        assert (Tainter.getTaint(ys) != 0);
+        assert (MultiTainter.getTaint(ys) != t);
     }
 
 
